@@ -63,6 +63,14 @@
       font-size: 1.08rem;
       border-left: 4px solid transparent;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .sidebar-menu a i {
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
     }
     .sidebar-menu a.active, .sidebar-menu a:hover {
       background: var(--hover);
@@ -170,25 +178,124 @@
     .btn-gold:hover {
       background: #b89e52;
     }
+    /* 모바일 네비게이션 바 */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+      padding: 0.5rem 0;
+    }
+    .mobile-nav-items {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-main);
+      font-size: 0.8rem;
+      padding: 0.5rem;
+      gap: 0.3rem;
+    }
+    .mobile-nav-item i {
+      font-size: 1.3rem;
+    }
+    .mobile-nav-item.active {
+      color: var(--main-burgundy);
+    }
+    .mobile-nav-item.active i {
+      color: var(--main-gold);
+    }
     @media (max-width: 900px) {
       .sidebar { width: 180px; }
       .main-content { padding: 1.2rem; }
       .header-admin { padding: 0 1rem; }
+    }
+    @media (max-width: 780px) {
+      .container-admin { flex-direction: column; }
+      .sidebar { 
+        display: none;
+      }
+      .mobile-nav {
+        display: block;
+      }
+      .main-area { 
+        flex: 1;
+        padding-bottom: 70px; /* 모바일 네비게이션 높이만큼 여백 추가 */
+      }
+      .header-admin {
+        padding: 0 0.8rem;
+        height: 60px;
+      }
+      .header-admin .left {
+        font-size: 1.1rem;
+      }
+      .header-admin .right button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+      }
+      .main-content {
+        padding: 1rem;
+      }
+      .content-title {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+      }
+      .admin-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
+      }
+      .admin-table th, 
+      .admin-table td {
+        padding: 0.8rem 1rem;
+        font-size: 0.95rem;
+      }
+      .btn-gold {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+      }
     }
     @media (max-width: 650px) {
       .container-admin { flex-direction: column; }
       .sidebar { width: 100%; flex-direction: row; border-right: none; border-bottom: 1px solid var(--sidebar-border);}
       .sidebar-logo, .sidebar-footer { display: none; }
       .sidebar-menu { flex-direction: row; padding: 0; }
-      .sidebar-menu a { padding: 0.8rem 1rem; font-size: 1rem;}
+      .sidebar-menu a { padding: 0.7rem 0.8rem; font-size: 0.9rem;}
       .main-area { flex: 1; }
+      .header-admin .right button {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.85rem;
+      }
+      .main-content {
+        padding: 0.8rem;
+      }
+      .content-title {
+        font-size: 1.1rem;
+      }
+      .admin-table th, 
+      .admin-table td {
+        padding: 0.7rem 0.8rem;
+        font-size: 0.9rem;
+      }
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script>
     // 간단한 메뉴 전환 (SPA가 아니니 화면 전환은 JS로)
     document.addEventListener('DOMContentLoaded', function () {
-      const menuLinks = document.querySelectorAll('.sidebar-menu a');
+      const menuLinks = document.querySelectorAll('.sidebar-menu a, .mobile-nav-item');
       const mainContent = document.querySelector('.main-content');
+      
       menuLinks.forEach(link => {
         link.addEventListener('click', function (e) {
           e.preventDefault();
@@ -391,7 +498,7 @@
               <tbody>
                 <tr>
                   <td>대표 스토리</td>
-                  <td>“10년 연구 끝에 찾아낸 로또 공식!”</td>
+                  <td>"10년 연구 끝에 찾아낸 로또 공식!"</td>
                   <td>관리자</td>
                   <td>2025-06-10</td>
                   <td><button class="btn-gold">수정</button></td>
@@ -476,19 +583,44 @@
     <nav class="sidebar">
       <div class="sidebar-logo">Lotto1081<br>관리자</div>
       <div class="sidebar-menu">
-        <a href="#" data-page="dashboard">대시보드</a>
-        <a href="#" data-page="customer">고객 관리</a>
-        <a href="#" data-page="order">주문/결제 내역</a>
-        <a href="#" data-page="lottonumber">추천번호 관리</a>
-        <a href="#" data-page="result">당첨 결과 관리</a>
-        <a href="#" data-page="send">발송/알림 관리</a>
-        <a href="#" data-page="content">콘텐츠/스토리 관리</a>
-        <a href="#" data-page="log">로그/통계</a>
-        <a href="#" data-page="account">계정/권한 관리</a>
-        <a href="#" data-page="setting">시스템 설정</a>
+        <a href="#" data-page="dashboard"><i class="fas fa-chart-line"></i>대시보드</a>
+        <a href="#" data-page="customer"><i class="fas fa-users"></i>고객 관리</a>
+        <a href="#" data-page="order"><i class="fas fa-shopping-cart"></i>주문/결제 내역</a>
+        <a href="#" data-page="lottonumber"><i class="fas fa-ticket-alt"></i>추천번호 관리</a>
+        <a href="#" data-page="result"><i class="fas fa-trophy"></i>당첨 결과 관리</a>
+        <a href="#" data-page="send"><i class="fas fa-paper-plane"></i>발송/알림 관리</a>
+        <a href="#" data-page="content"><i class="fas fa-file-alt"></i>콘텐츠/스토리 관리</a>
+        <a href="#" data-page="log"><i class="fas fa-history"></i>로그/통계</a>
+        <a href="#" data-page="account"><i class="fas fa-user-cog"></i>계정/권한 관리</a>
+        <a href="#" data-page="setting"><i class="fas fa-cog"></i>시스템 설정</a>
       </div>
       <div class="sidebar-footer">
         &copy; 2025 Lotto1081
+      </div>
+    </nav>
+    <!-- 모바일 네비게이션 -->
+    <nav class="mobile-nav">
+      <div class="mobile-nav-items">
+        <a href="#" class="mobile-nav-item active" data-page="dashboard">
+          <i class="fas fa-chart-line"></i>
+          <span>대시보드</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="customer">
+          <i class="fas fa-users"></i>
+          <span>고객</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="order">
+          <i class="fas fa-shopping-cart"></i>
+          <span>주문</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="lottonumber">
+          <i class="fas fa-ticket-alt"></i>
+          <span>번호</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="result">
+          <i class="fas fa-trophy"></i>
+          <span>결과</span>
+        </a>
       </div>
     </nav>
     <!-- 메인 영역 -->
