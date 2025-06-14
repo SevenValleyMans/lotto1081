@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lotto1081 관리자 페이지</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-burgundy: #7b2336;
+      --main-gold: #c2a052;
+      --main-bg: #f7f5f2;
+      --sidebar-bg: #fff;
+      --sidebar-border: #e6e1da;
+      --header-bg: #fff;
+      --header-border: #e6e1da;
+      --gray-light: #ede6e3;
+      --text-main: #222;
+      --text-sub: #7b2336;
+      --hover: #f4e9e6;
+      --shadow: 0 2px 8px rgba(123,35,54,0.07);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--main-bg);
+      font-family: 'Inter', 'Noto Sans KR', sans-serif;
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+    .container-admin {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 240px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-logo {
+      font-weight: 700;
+      font-size: 1.6rem;
+      text-align: center;
+      color: var(--main-burgundy);
+      padding: 2rem 0 1.3rem 0;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--sidebar-border);
+      background: var(--sidebar-bg);
+    }
+    .sidebar-menu {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-top: 1rem;
+    }
+    .sidebar-menu a {
+      text-decoration: none;
+      color: var(--text-main);
+      padding: 1.1rem 2rem;
+      transition: 0.2s;
+      font-size: 1.08rem;
+      border-left: 4px solid transparent;
+      font-weight: 500;
+    }
+    .sidebar-menu a.active, .sidebar-menu a:hover {
+      background: var(--hover);
+      color: var(--main-burgundy);
+      border-left: 4px solid var(--main-gold);
+      font-weight: 700;
+    }
+    .sidebar-footer {
+      text-align: center;
+      padding: 1rem 0;
+      border-top: 1px solid var(--sidebar-border);
+      font-size: 0.98rem;
+      color: #b3a2a0;
+      background: #fcfbf9;
+    }
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .header-admin {
+      height: 68px;
+      background: var(--header-bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--header-border);
+      padding: 0 2.3rem;
+      box-shadow: var(--shadow);
+    }
+    .header-admin .left {
+      font-size: 1.17rem;
+      color: var(--main-burgundy);
+      font-weight: 600;
+    }
+    .header-admin .right button {
+      margin-left: 0.5rem;
+      padding: 0.5rem 1.1rem;
+      border-radius: 22px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.18s;
+    }
+    .header-admin .right .btn-setting {
+      background: var(--main-gold);
+      color: #fff;
+      border: 1px solid #cbb169;
+    }
+    .header-admin .right .btn-logout {
+      background: #fff;
+      color: var(--main-burgundy);
+      border: 1px solid var(--main-burgundy);
+    }
+    .main-content {
+      flex: 1;
+      background: var(--main-bg);
+      padding: 2.5rem 2.5rem 2rem 2.5rem;
+      overflow-y: auto;
+    }
+    .content-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      color: var(--main-burgundy);
+      letter-spacing: 0.5px;
+    }
+    /* 예시용 테이블 */
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2.5rem;
+      background: #fff;
+      box-shadow: var(--shadow);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .admin-table th, .admin-table td {
+      padding: 1rem 1.2rem;
+      text-align: left;
+    }
+    .admin-table th {
+      background: var(--main-burgundy);
+      color: #fff;
+      font-weight: 600;
+      border-bottom: 2px solid var(--main-gold);
+      letter-spacing: 0.5px;
+    }
+    .admin-table tr:not(:last-child) td {
+      border-bottom: 1px solid var(--gray-light);
+    }
+    .btn-gold {
+      background: var(--main-gold);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.99rem;
+      transition: 0.18s;
+    }
+    .btn-gold:hover {
+      background: #b89e52;
+    }
+    @media (max-width: 900px) {
+      .sidebar { width: 180px; }
+      .main-content { padding: 1.2rem; }
+      .header-admin { padding: 0 1rem; }
+    }
+    @media (max-width: 650px) {
+      .container-admin { flex-direction: column; }
+      .sidebar { width: 100%; flex-direction: row; border-right: none; border-bottom: 1px solid var(--sidebar-border);}
+      .sidebar-logo, .sidebar-footer { display: none; }
+      .sidebar-menu { flex-direction: row; padding: 0; }
+      .sidebar-menu a { padding: 0.8rem 1rem; font-size: 1rem;}
+      .main-area { flex: 1; }
+    }
+  </style>
+  <script>
+    // 간단한 메뉴 전환 (SPA가 아니니 화면 전환은 JS로)
+    document.addEventListener('DOMContentLoaded', function () {
+      const menuLinks = document.querySelectorAll('.sidebar-menu a');
+      const mainContent = document.querySelector('.main-content');
+      menuLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          menuLinks.forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+          // 각 메뉴별 더미 컨텐츠 출력 (필요시 세부 페이지 구조 추가)
+          const page = this.getAttribute('data-page');
+          mainContent.innerHTML = renderPage(page);
+        });
+      });
+      // 기본: 대시보드
+      menuLinks[0].classList.add('active');
+      mainContent.innerHTML = renderPage('dashboard');
+    });
+
+    function renderPage(page) {
+      switch (page) {
+        case 'dashboard':
+          return `
+            <div class="content-title">대시보드</div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:2rem;">
+              <div style="background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:1.5rem;">
+                <div style="color:var(--main-burgundy); font-size:2rem; font-weight:700;">356</div>
+                <div style="margin-top:0.4rem; color:var(--main-gold); font-weight:600;">오늘 결제 건수</div>
+              </div>
+              <div style="background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:1.5rem;">
+                <div style="color:var(--main-burgundy); font-size:2rem; font-weight:700;">842</div>
+                <div style="margin-top:0.4rem; color:var(--main-gold); font-weight:600;">신규 회원</div>
+              </div>
+              <div style="background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:1.5rem;">
+                <div style="color:var(--main-burgundy); font-size:2rem; font-weight:700;">2</div>
+                <div style="margin-top:0.4rem; color:var(--main-gold); font-weight:600;">1등 당첨자(이번주)</div>
+              </div>
+            </div>
+            <div style="background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:1.5rem;">
+              <b>공지:</b> 금주 1등 당첨자 소식이 있습니다! 고객센터 응대 강화 필요.<br>
+              <b>발송 실패 SMS:</b> 1건 (확인 및 재발송 조치)
+            </div>
+          `;
+        case 'customer':
+          return `
+            <div class="content-title">고객 관리</div>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>이름</th>
+                  <th>전화번호</th>
+                  <th>이메일</th>
+                  <th>가입일</th>
+                  <th>결제내역</th>
+                  <th>추천번호 발송</th>
+                  <th>상세</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>홍길동</td>
+                  <td>010-1234-5678</td>
+                  <td>hong@example.com</td>
+                  <td>2025-06-01</td>
+                  <td>3회</td>
+                  <td>2회</td>
+                  <td><button class="btn-gold">보기</button></td>
+                </tr>
+                <tr>
+                  <td>이영희</td>
+                  <td>010-8888-1111</td>
+                  <td>lee@example.com</td>
+                  <td>2025-06-05</td>
+                  <td>1회</td>
+                  <td>1회</td>
+                  <td><button class="btn-gold">보기</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="btn-gold">신규 고객 등록</button>
+          `;
+        case 'order':
+          return `
+            <div class="content-title">주문/결제 내역</div>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>주문번호</th>
+                  <th>고객명</th>
+                  <th>상품</th>
+                  <th>결제금액</th>
+                  <th>상태</th>
+                  <th>결제일시</th>
+                  <th>상세</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#20250614001</td>
+                  <td>홍길동</td>
+                  <td>로또 추천 1주</td>
+                  <td>₩9,900</td>
+                  <td>완료</td>
+                  <td>2025-06-14 13:25</td>
+                  <td><button class="btn-gold">보기</button></td>
+                </tr>
+              </tbody>
+            </table>
+          `;
+        case 'lottonumber':
+          return `
+            <div class="content-title">추천번호 관리</div>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>회차</th>
+                  <th>대표 연구번호</th>
+                  <th>랜덤 번호</th>
+                  <th>등록일</th>
+                  <th>수정</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1081</td>
+                  <td>7, 15, 19, 27, 31, 41</td>
+                  <td>5, 9, 16, 21, 28, 39</td>
+                  <td>2025-06-12</td>
+                  <td><button class="btn-gold">수정</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="btn-gold">신규 번호 등록</button>
+          `;
+        case 'result':
+          return `
+            <div class="content-title">당첨 결과 관리</div>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>회차</th>
+                  <th>당첨번호</th>
+                  <th>보너스번호</th>
+                  <th>등록일</th>
+                  <th>수정</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1081</td>
+                  <td>7, 15, 19, 27, 31, 41</td>
+                  <td>23</td>
+                  <td>2025-06-13</td>
+                  <td><button class="btn-gold">수정</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="btn-gold">결과 등록</button>
+          `;
+        case 'send':
+          return `
+            <div class="content-title">발송/알림 관리</div>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>발송일시</th>
+                  <th>고객명</th>
+                  <th>발송유형</th>
+                  <th>결과</th>
+                  <th>재발송</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2025-06-14 09:02</td>
+                  <td>홍길동</td>
+                  <td>SMS</td>
+                  <td>성공</td>
+                  <td><button class="btn-gold">재발송</button></td>
+                </tr>
+                <tr>
+                  <td>2025-06-13 19:32</td>
+                  <td>이영희</td>
+                  <td>Kakao</td>
+                  <td style="color:crimson;">실패</td>
+                  <td><button class="btn-gold">재발송</button></td>
+                </tr>
+              </tbody>
+            </table>
+          `;
+        case 'content':
+          return `
+            <div class="content-title">콘텐츠/스토리 관리</div>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>유형</th>
+                  <th>제목/내용</th>
+                  <th>작성자</th>
+                  <th>등록일</th>
+                  <th>수정</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>대표 스토리</td>
+                  <td>“10년 연구 끝에 찾아낸 로또 공식!”</td>
+                  <td>관리자</td>
+                  <td>2025-06-10</td>
+                  <td><button class="btn-gold">수정</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="btn-gold">신규 등록</button>
+          `;
+        case 'log':
+          return `
+            <div class="content-title">로그/통계</div>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>일시</th>
+                  <th>구분</th>
+                  <th>설명</th>
+                  <th>담당자</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2025-06-14 10:00</td>
+                  <td>로그인</td>
+                  <td>관리자(admin) 로그인 성공</td>
+                  <td>admin</td>
+                </tr>
+                <tr>
+                  <td>2025-06-13 20:30</td>
+                  <td>수정</td>
+                  <td>1081회 추천번호 변경</td>
+                  <td>master</td>
+                </tr>
+              </tbody>
+            </table>
+          `;
+        case 'account':
+          return `
+            <div class="content-title">계정/권한 관리</div>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>아이디</th>
+                  <th>이름</th>
+                  <th>권한</th>
+                  <th>등록일</th>
+                  <th>비밀번호 초기화</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>admin</td>
+                  <td>관리자</td>
+                  <td>최고 관리자</td>
+                  <td>2025-06-01</td>
+                  <td><button class="btn-gold">초기화</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="btn-gold">신규 계정 추가</button>
+          `;
+        case 'setting':
+          return `
+            <div class="content-title">시스템 설정</div>
+            <div style="background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:2rem; max-width:520px;">
+              <label style="display:block; font-weight:600; color:var(--main-burgundy); margin-bottom:0.8rem;">SMS API Key</label>
+              <input type="text" style="width:100%; padding:0.7rem; border:1px solid #ddd; border-radius:8px; margin-bottom:1.5rem;" placeholder="API Key 입력" disabled />
+              <label style="display:block; font-weight:600; color:var(--main-burgundy); margin-bottom:0.8rem;">결제 연동 설정</label>
+              <input type="text" style="width:100%; padding:0.7rem; border:1px solid #ddd; border-radius:8px; margin-bottom:1.5rem;" placeholder="PG사 설정" disabled />
+              <button class="btn-gold">저장</button>
+            </div>
+          `;
+        default:
+          return `<div>잘못된 접근입니다.</div>`;
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="container-admin">
+    <!-- 사이드바 -->
+    <nav class="sidebar">
+      <div class="sidebar-logo">Lotto1081<br>관리자</div>
+      <div class="sidebar-menu">
+        <a href="#" data-page="dashboard">대시보드</a>
+        <a href="#" data-page="customer">고객 관리</a>
+        <a href="#" data-page="order">주문/결제 내역</a>
+        <a href="#" data-page="lottonumber">추천번호 관리</a>
+        <a href="#" data-page="result">당첨 결과 관리</a>
+        <a href="#" data-page="send">발송/알림 관리</a>
+        <a href="#" data-page="content">콘텐츠/스토리 관리</a>
+        <a href="#" data-page="log">로그/통계</a>
+        <a href="#" data-page="account">계정/권한 관리</a>
+        <a href="#" data-page="setting">시스템 설정</a>
+      </div>
+      <div class="sidebar-footer">
+        &copy; 2025 Lotto1081
+      </div>
+    </nav>
+    <!-- 메인 영역 -->
+    <div class="main-area">
+      <!-- 헤더 -->
+      <header class="header-admin">
+        <div class="left">Lotto1081 관리자</div>
+        <div class="right">
+          <button class="btn-setting">환경설정</button>
+          <button class="btn-logout">로그아웃</button>
+        </div>
+      </header>
+      <!-- 컨텐츠 영역 -->
+      <main class="main-content">
+        <!-- JS에서 채워짐 -->
+      </main>
+    </div>
+  </div>
+</body>
+</html>
