@@ -1,482 +1,174 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>마이페이지 | 로또1081</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#8B0000',
+            secondary: '#1E3A8A',
+            accent: '#64748B',
+            light: '#F8FAFC',
+          },
+          fontFamily: {
+            sans: ['Noto Sans KR', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
   <style>
-    :root {
-      --main-burgundy: #7b192b;
-      --main-gold: #ffd700;
-      --main-white: #fff;
-      --main-gray: #f8f8f8;
-      --main-shadow: 0 2px 16px rgba(0,0,0,0.06);
-      --radius: 16px;
-    }
-    body {
-      font-family: 'Inter', 'Noto Sans KR', sans-serif;
-      margin: 0; padding: 0;
-      background: var(--main-gray);
-      color: #333;
-    }
-    .mypage-container {
-      max-width: 1200px;
-      margin: 40px auto;
-      padding: 0 20px;
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 30px;
-    }
-    .mypage-sidebar {
-      background: var(--main-white);
-      border-radius: var(--radius);
-      box-shadow: var(--main-shadow);
-      padding: 25px;
-      height: fit-content;
-    }
-    .mypage-main {
-      background: var(--main-white);
-      border-radius: var(--radius);
-      box-shadow: var(--main-shadow);
-      padding: 30px;
-    }
-    .mypage-header {
-      margin-bottom: 30px;
-    }
-    .mypage-header h2 {
-      color: var(--main-burgundy);
-      margin-bottom: 0.3em;
-      font-weight: 700;
-      font-size: 1.8em;
-    }
-    .mypage-info {
-      background: #fff4ec;
-      border-left: 6px solid var(--main-gold);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 24px;
-    }
-    .mypage-info strong {
-      color: var(--main-burgundy);
-      display: inline-block;
-      width: 80px;
-    }
-    .mypage-section {
-      margin-bottom: 35px;
-    }
-    .mypage-section h3 {
-      font-size: 1.2em;
-      color: var(--main-burgundy);
-      margin-bottom: 15px;
-      border-bottom: 2px solid var(--main-gold);
-      padding-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .mypage-section h3 i {
-      color: var(--main-gold);
-    }
-    .table-list {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--main-gray);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .table-list th, .table-list td {
-      padding: 14px 16px;
-      text-align: left;
-    }
-    .table-list th {
-      background: var(--main-burgundy);
-      color: var(--main-gold);
-      font-weight: 600;
-    }
-    .table-list tr:nth-child(even) {
-      background: #fff;
-    }
-    .table-list tr:hover {
-      background: #fff4ec;
-    }
-    .mypage-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 40px;
-    }
-    .mypage-actions button {
-      flex: 1;
-      padding: 12px 0;
-      border: none;
-      border-radius: var(--radius);
-      background: var(--main-burgundy);
-      color: var(--main-gold);
-      font-size: 1.1em;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .mypage-actions button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(123,25,43,0.15);
-    }
-    .mypage-actions button.logout {
-      background: #fff;
-      color: var(--main-burgundy);
-      border: 1px solid var(--main-burgundy);
-    }
-    .mypage-actions button.logout:hover {
-      background: var(--main-burgundy);
-      color: var(--main-gold);
-    }
-    .quick-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    .stat-card {
-      background: var(--main-white);
-      border-radius: var(--radius);
-      padding: 20px;
-      text-align: center;
-      box-shadow: var(--main-shadow);
-    }
-    .stat-card .number {
-      font-size: 2em;
-      font-weight: 700;
-      color: var(--main-burgundy);
-      margin-bottom: 5px;
-    }
-    .stat-card .label {
-      color: #666;
-      font-size: 0.95em;
-    }
-    @media (max-width: 1024px) {
-      .mypage-container {
-        grid-template-columns: 1fr;
-        max-width: 800px;
-      }
-      .mypage-sidebar {
-        display: none;
-      }
-    }
-    @media (max-width: 780px) {
-      .mypage-container {
-        margin: 0;
-        padding: 0;
-        background: var(--main-gray);
-      }
-      .mypage-main {
-        border-radius: 0;
-        box-shadow: none;
-        padding: 16px;
-      }
-      .mypage-header {
-        margin-bottom: 20px;
-        padding: 16px;
-        background: var(--main-white);
-        border-radius: var(--radius);
-        box-shadow: var(--main-shadow);
-      }
-      .mypage-header h2 {
-        font-size: 1.4em;
-      }
-      .mypage-section {
-        margin-bottom: 20px;
-        background: var(--main-white);
-        border-radius: var(--radius);
-        box-shadow: var(--main-shadow);
-        padding: 16px;
-      }
-      .mypage-section h3 {
-        font-size: 1.1em;
-        margin-bottom: 12px;
-      }
-      .table-list {
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        background: transparent;
-        box-shadow: none;
-      }
-      .table-list th, 
-      .table-list td {
-        padding: 12px 10px;
-        font-size: 0.95em;
-        white-space: nowrap;
-      }
-      .table-list th {
-        position: sticky;
-        left: 0;
-        z-index: 1;
-      }
-      .table-list td:first-child {
-        position: sticky;
-        left: 0;
-        background: inherit;
-        z-index: 1;
-      }
-      .table-list tr:nth-child(even) {
-        background: var(--main-gray);
-      }
-      .table-list tr:hover {
-        background: #fff4ec;
-      }
-      /* 모바일용 빠른 통계 */
-      .mobile-stats {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin-bottom: 20px;
-        padding: 0 16px;
-      }
-      .mobile-stat-card {
-        background: var(--main-white);
-        border-radius: var(--radius);
-        padding: 12px;
-        text-align: center;
-        box-shadow: var(--main-shadow);
-      }
-      .mobile-stat-card .number {
-        font-size: 1.5em;
-        font-weight: 700;
-        color: var(--main-burgundy);
-        margin-bottom: 4px;
-      }
-      .mobile-stat-card .label {
-        color: #666;
-        font-size: 0.85em;
-      }
-      /* 모바일용 회원정보 */
-      .mobile-info {
-        background: #fff4ec;
-        border-left: 6px solid var(--main-gold);
-        border-radius: var(--radius);
-        padding: 16px;
-        margin: 0 16px 20px 16px;
-      }
-      .mobile-info strong {
-        color: var(--main-burgundy);
-        display: inline-block;
-        width: 70px;
-      }
-      /* 모바일용 액션 버튼 */
-      .mobile-actions {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--main-white);
-        padding: 12px 16px;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-        display: flex;
-        gap: 10px;
-        z-index: 100;
-      }
-      .mobile-actions button {
-        flex: 1;
-        padding: 12px 0;
-        border: none;
-        border-radius: var(--radius);
-        background: var(--main-burgundy);
-        color: var(--main-gold);
-        font-size: 1em;
-        font-weight: 600;
-        cursor: pointer;
-      }
-      .mobile-actions button.logout {
-        background: #fff;
-        color: var(--main-burgundy);
-        border: 1px solid var(--main-burgundy);
-      }
-      /* 메인 컨텐츠 하단 여백 추가 */
-      .mypage-main {
-        padding-bottom: 80px;
-      }
-    }
-    @media (max-width: 480px) {
-      .mobile-stats {
-        grid-template-columns: 1fr;
-      }
-      .mobile-stat-card {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 16px;
-      }
-      .mobile-stat-card .number {
-        margin-bottom: 0;
-      }
-      .mobile-info strong {
-        width: 60px;
-      }
-      .table-list th, 
-      .table-list td {
-        padding: 10px 8px;
-        font-size: 0.9em;
-      }
-    }
+    body { font-family: 'Noto Sans KR', sans-serif; }
+    .section-card { background: #fff; border-radius: 1rem; box-shadow: 0 4px 24px rgba(30,58,138,0.07);}
+    .table thead { background: #F8FAFC; }
+    .status-paid { color: #fff; background: #8B0000; border-radius: 0.375rem; padding: 0.25rem 0.75rem;}
+    .status-expired { color: #fff; background: #64748B; border-radius: 0.375rem; padding: 0.25rem 0.75rem;}
   </style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-  <div class="mypage-container">
-    <!-- 사이드바 -->
-    <div class="mypage-sidebar">
-      <div class="mypage-header">
-        <h2>마이페이지</h2>
-        <div style="color:#666; font-size:1em;">나의 정보와 이용내역을 확인하세요</div>
+<body class="bg-light min-h-screen">
+<!-- Navigation (공통으로 복붙 가능) -->
+<nav class="fixed w-full bg-white/90 backdrop-blur-sm shadow-sm z-50 border-b border-accent/20">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="/" class="text-2xl font-bold text-primary relative">
+        로또1081
+        <span class="absolute -top-1 -right-2 w-2 h-2 bg-accent rounded-full"></span>
+      </a>
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center space-x-8">
+        <a href="index.html" class="text-gray-600 hover:text-primary transition">홈</a>
+        <a href="myPage.html" class="text-gray-700 text-lg font-bold hover:text-primary">마이페이지</a>
+        <a href="faq.html" class="text-gray-600 hover:text-primary transition">고객센터</a>
+        <a href="login.html" class="bg-primary text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition">로그아웃</a>
       </div>
-      
-      <!-- 회원 기본 정보 -->
-      <div class="mypage-info">
-        <div><strong>이름:</strong> 홍길동</div>
-        <div><strong>휴대폰:</strong> 010-1234-5678</div>
-        <div><strong>이메일:</strong> user@email.com</div>
-        <div><strong>가입일:</strong> 2024-12-15</div>
-      </div>
-
-      <!-- 빠른 통계 -->
-      <div class="quick-stats">
-        <div class="stat-card">
-          <div class="number">12</div>
-          <div class="label">추천번호</div>
-        </div>
-        <div class="stat-card">
-          <div class="number">3</div>
-          <div class="label">당첨횟수</div>
-        </div>
-        <div class="stat-card">
-          <div class="number">2</div>
-          <div class="label">문의건수</div>
-        </div>
-      </div>
-
-      <!-- 로그아웃/회원탈퇴 -->
-      <div class="mypage-actions">
-        <button onclick="alert('로그아웃 기능 연결 예정')" class="logout">로그아웃</button>
-        <button onclick="alert('회원탈퇴 기능 연결 예정')">회원탈퇴</button>
-      </div>
-    </div>
-
-    <!-- 메인 컨텐츠 -->
-    <div class="mypage-main">
-      <!-- 모바일용 빠른 통계 -->
-      <div class="mobile-stats">
-        <div class="mobile-stat-card">
-          <div class="number">12</div>
-          <div class="label">추천번호</div>
-        </div>
-        <div class="mobile-stat-card">
-          <div class="number">3</div>
-          <div class="label">당첨횟수</div>
-        </div>
-        <div class="mobile-stat-card">
-          <div class="number">2</div>
-          <div class="label">문의건수</div>
-        </div>
-      </div>
-
-      <!-- 모바일용 회원정보 -->
-      <div class="mobile-info">
-        <div><strong>이름:</strong> 홍길동</div>
-        <div><strong>휴대폰:</strong> 010-1234-5678</div>
-        <div><strong>이메일:</strong> user@email.com</div>
-        <div><strong>가입일:</strong> 2024-12-15</div>
-      </div>
-
-      <!-- 추천번호 이력 -->
-      <div class="mypage-section">
-        <h3><i class="fas fa-ticket-alt"></i>최근 추천번호 이력</h3>
-        <table class="table-list">
-          <thead>
-            <tr>
-              <th>회차</th>
-              <th>추천일</th>
-              <th>추천번호</th>
-              <th>당첨여부</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1081회</td>
-              <td>2025-06-10</td>
-              <td>3, 7, 12, 28, 32, 41 + 15</td>
-              <td><span style="color:var(--main-burgundy);">당첨</span></td>
-            </tr>
-            <tr>
-              <td>1080회</td>
-              <td>2025-06-03</td>
-              <td>5, 11, 19, 24, 36, 43 + 2</td>
-              <td><span style="color:#666;">미당첨</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 결제/구매 이력 -->
-      <div class="mypage-section">
-        <h3><i class="fas fa-shopping-cart"></i>결제 이력</h3>
-        <table class="table-list">
-          <thead>
-            <tr>
-              <th>결제일</th>
-              <th>상품명</th>
-              <th>결제금액</th>
-              <th>상태</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>2025-06-10</td>
-              <td>로또 추천번호 1회</td>
-              <td>10,000원</td>
-              <td><span style="color:var(--main-burgundy);">완료</span></td>
-            </tr>
-            <tr>
-              <td>2025-06-03</td>
-              <td>로또 추천번호 1회</td>
-              <td>10,000원</td>
-              <td><span style="color:var(--main-burgundy);">완료</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 문의내역 -->
-      <div class="mypage-section">
-        <h3><i class="fas fa-question-circle"></i>내 문의내역</h3>
-        <table class="table-list">
-          <thead>
-            <tr>
-              <th>문의일</th>
-              <th>제목</th>
-              <th>상태</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>2025-05-22</td>
-              <td>환불 문의</td>
-              <td><span style="color:#666;">답변 완료</span></td>
-            </tr>
-            <tr>
-              <td>2025-05-11</td>
-              <td>결제오류</td>
-              <td><span style="color:var(--main-burgundy);">답변 대기</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 모바일용 액션 버튼 -->
-      <div class="mobile-actions">
-        <button onclick="alert('로그아웃 기능 연결 예정')" class="logout">로그아웃</button>
-        <button onclick="alert('회원탈퇴 기능 연결 예정')">회원탈퇴</button>
-      </div>
+      <!-- Mobile Hamburger -->
+      <button id="menuBtn" class="block md:hidden p-2 rounded hover:bg-light focus:outline-none">
+        <svg class="w-7 h-7 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
     </div>
   </div>
+  <!-- 모바일 전체 메뉴 오버레이 (숨김, 토글) -->
+  <div id="mobileMenu" class="md:hidden fixed inset-0 bg-black/40 z-50 hidden">
+    <div class="absolute right-0 top-0 w-64 h-full bg-white shadow-xl flex flex-col pt-8 pb-4 px-6">
+      <!-- 닫기 버튼 -->
+      <button id="closeMenu" class="absolute top-3 right-4 text-2xl text-accent hover:text-primary">&times;</button>
+      <nav class="flex flex-col space-y-6 mt-8">
+        <a href="index.html" class="text-gray-700 text-lg font-bold hover:text-primary">홈</a>
+        <a href="myPage.html" class="text-gray-700 text-lg font-bold hover:text-primary">마이페이지</a>
+        <a href="faq.html" class="text-gray-700 text-lg font-bold hover:text-primary">고객센터</a>
+        <a href="login.html" class="text-white bg-primary text-lg px-4 py-2 rounded-full font-bold text-center hover:bg-opacity-90 transition">로그아웃</a>
+      </nav>
+      <div class="mt-auto text-xs text-gray-400 pt-8 text-center">© 2024 로또1081</div>
+    </div>
+  </div>
+</nav>
+<!-- 네비 겹침 방지 padding-top 적용 예시 -->
+<div class="h-16 md:h-16"></div>
+
+  <!-- Main -->
+  <main class="container mx-auto px-4 max-w-3xl pt-24 pb-10">
+    <!-- 결제/구독 현황 -->
+    <section class="section-card mb-8 p-6 border border-accent/20">
+      <h2 class="text-2xl font-bold text-primary mb-3">결제 / 구독 현황</h2>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div class="text-lg font-semibold mb-1">정기구독 상태:
+            <span class="status-paid">구독중</span>
+            <!-- <span class="status-expired">만료</span> -->
+          </div>
+          <div class="text-gray-500">최근 결제일: <span class="font-semibold text-gray-700">2024-06-20</span></div>
+          <div class="text-gray-500">결제 수단: <span class="font-semibold text-gray-700">카카오페이</span></div>
+          <div class="text-gray-500">다음 결제 예정일: <span class="font-semibold text-gray-700">2024-07-20</span></div>
+        </div>
+        <div>
+          <button class="mt-2 sm:mt-0 px-4 py-2 rounded-lg bg-accent text-white font-bold hover:bg-primary transition">구독 해지</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 받은 추천번호 이력 -->
+    <section class="section-card mb-8 p-6 border border-accent/20">
+      <h2 class="text-2xl font-bold text-primary mb-3">받은 추천번호 이력</h2>
+      <div class="overflow-x-auto">
+        <table class="table w-full text-center text-gray-700">
+          <thead>
+            <tr>
+              <th class="py-2 px-3">회차</th>
+              <th class="py-2 px-3">발송일</th>
+              <th class="py-2 px-3">추천번호</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="py-2 px-3 font-semibold">1081회</td>
+              <td class="py-2 px-3">2024-06-29</td>
+              <td class="py-2 px-3">7, 19, 23, 32, 40, 42</td>
+            </tr>
+            <tr>
+              <td class="py-2 px-3 font-semibold">1080회</td>
+              <td class="py-2 px-3">2024-06-22</td>
+              <td class="py-2 px-3">3, 12, 17, 24, 33, 41</td>
+            </tr>
+            <tr>
+              <td class="py-2 px-3 font-semibold">1079회</td>
+              <td class="py-2 px-3">2024-06-15</td>
+              <td class="py-2 px-3">5, 18, 22, 28, 36, 43</td>
+            </tr>
+            <!-- 더미 데이터 추가 가능 -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 내 Q&A 내역 -->
+    <section class="section-card p-6 border border-accent/20">
+      <h2 class="text-2xl font-bold text-primary mb-3">내 Q&A 내역</h2>
+      <div class="overflow-x-auto">
+        <table class="table w-full text-center text-gray-700">
+          <thead>
+            <tr>
+              <th class="py-2 px-3">제목</th>
+              <th class="py-2 px-3">작성일</th>
+              <th class="py-2 px-3">답변상태</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="py-2 px-3 font-semibold text-left">환불 문의</td>
+              <td class="py-2 px-3">2024-06-21</td>
+              <td class="py-2 px-3"><span class="status-paid">답변완료</span></td>
+            </tr>
+            <tr>
+              <td class="py-2 px-3 font-semibold text-left">추천번호 발송 시간이 궁금합니다</td>
+              <td class="py-2 px-3">2024-06-20</td>
+              <td class="py-2 px-3"><span class="status-expired">미답변</span></td>
+            </tr>
+            <!-- 더미 데이터 추가 가능 -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- 햄버거 메뉴 동작 스크립트 (아래 한 번만 추가하면 됨) -->
+  <script>
+  const menuBtn = document.getElementById('menuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const closeMenu = document.getElementById('closeMenu');
+  menuBtn.onclick = () => mobileMenu.classList.remove('hidden');
+  closeMenu.onclick = () => mobileMenu.classList.add('hidden');
+  // 메뉴 오버레이 클릭시 닫기
+  mobileMenu.onclick = (e) => { if(e.target === mobileMenu) mobileMenu.classList.add('hidden'); };
+  </script>
+
 </body>
 </html>
