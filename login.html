@@ -49,6 +49,20 @@ const firebaseConfig = {
 </head>
 <body class="min-h-screen bg-light font-sans flex flex-col items-center justify-center" style="background-image: theme('backgroundImage.hero-pattern');">
 
+    <!-- 상단 홈 버튼 네비게이션 -->
+<nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-sm border-b border-accent/20 z-40">
+  <div class="w-full px-4 h-14 flex items-center">
+    <a href="index.html" class="flex items-center gap-2 text-primary font-bold text-xl hover:underline">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M3 12l9-9 9 9" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9 21V9h6v12" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>로또1081 홈으로</span>
+    </a>
+  </div>
+</nav>
+
+
   <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md border border-primary">
     <h2 class="text-2xl font-bold text-primary mb-6 text-center">로그인 / 회원가입</h2>
     <form id="loginForm" class="space-y-5">
@@ -69,6 +83,26 @@ const firebaseConfig = {
     </form>
     <div id="loginMessage" class="mt-4 text-center text-accent text-sm"></div>
   </div>
+
+<div class="flex items-center justify-center my-5 w-full">
+  <div class="flex-grow max-w-[220px] h-px bg-gray-200"></div>
+  <span class="mx-3 text-gray-400 text-sm font-semibold">또는</span>
+  <div class="flex-grow max-w-[220px] h-px bg-gray-200"></div>
+</div>
+
+<div class="flex justify-center">
+  <button type="button" id="googleSignInBtn"
+    class="w-[340px] flex items-center justify-center gap-3 py-3 px-4 rounded-lg border border-[#dadce0] bg-white shadow-sm hover:shadow-md hover:border-primary transition font-bold text-gray-700 relative group focus:outline-none focus:ring-2 focus:ring-primary">
+    <span class="absolute left-4 flex items-center">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+           alt="Google" class="w-6 h-6" />
+    </span>
+    <span class="mx-auto text-base group-hover:text-primary transition">Google 계정으로 계속</span>
+  </button>
+</div>
+
+
+
 
   <script>
     // 1. reCAPTCHA
@@ -131,6 +165,28 @@ const firebaseConfig = {
         }).catch(function(error) {
             msg.textContent = "인증 실패: " + error.message;
         });
+        };
+
+
+        // 구글 로그인
+        document.getElementById('googleSignInBtn').onclick = function() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        firebase.auth().signInWithPopup(provider)
+            .then(function(result) {
+            const user = result.user;
+            // Firestore에 사용자 정보 저장
+            db.collection('users').doc(user.uid).set({
+                name: user.displayName || '',
+                email: user.email || '',
+                provider: 'google',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true }).then(() => {
+                window.location.href = "index.html";
+            });
+            }).catch(function(error) {
+            document.getElementById('loginMessage').textContent = "구글 로그인 실패: " + error.message;
+            });
         };
 
   </script>

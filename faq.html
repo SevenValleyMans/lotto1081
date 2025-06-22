@@ -7,13 +7,30 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="tailwind.config.js"></script>
+      <!-- Firebase SDKs (v8.x.x) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script>
+  // 아래 config는 본인의 firebase 프로젝트 설정 값으로 대체해야 함
+    const firebaseConfig = {
+      apiKey: "AIzaSyBH3AvpxtOF7NQDH_fDOuAXSyEfw8r5kbU",
+      authDomain: "lotto1081-2b3dc.firebaseapp.com",
+      projectId: "lotto1081-2b3dc",
+      storageBucket: "lotto1081-2b3dc.firebasestorage.app",
+      messagingSenderId: "785261698548",
+      appId: "1:785261698548:web:84531550d2380c24f82da1",
+      measurementId: "G-EMCRJS1KM2"
+    };
+  firebase.initializeApp(firebaseConfig);
+</script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
             primary: '#8B0000',
-            secondary: '#1E3A8A',
+            secondary: '#D4AF37',
             accent: '#64748B',
             light: '#F8FAFC',
           },
@@ -45,7 +62,11 @@
         <a href="index.html" class="text-gray-600 hover:text-primary transition">홈</a>
         <a href="myPage.html" class="text-gray-600 hover:text-primary transition">마이페이지</a>
         <a href="faq.html" class="text-gray-700 text-lg font-bold hover:text-primary">고객센터</a>
-        <a href="login.html" class="bg-primary text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition">로그아웃</a>
+        <a href="login.html" id="loginNavBtn" class="bg-primary text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition">로그인</a>
+      <!-- 로그인 후 노출될 유저/로그아웃 버튼(초기에 hidden) -->
+      <span id="userNav" class="hidden flex items-center space-x-2">
+        <span id="userName" class="text-secondary font-bold"></span>
+      </span>
       </div>
       <!-- Mobile Hamburger -->
       <button id="menuBtn" class="block md:hidden p-2 rounded hover:bg-light focus:outline-none">
@@ -66,7 +87,11 @@
       <a href="index.html" class="text-gray-700 text-lg font-bold hover:text-primary">홈</a>
       <a href="myPage.html" class="text-gray-700 text-lg font-bold hover:text-primary">마이페이지</a>
       <a href="faq.html" class="text-gray-700 text-lg font-bold hover:text-primary">고객센터</a>
-      <a href="login.html" class="text-white bg-primary text-lg px-4 py-2 rounded-full font-bold text-center hover:bg-opacity-90 transition">로그아웃</a>
+        <a href="login.html" id="loginMobileBtn" class="text-white bg-primary text-lg px-4 py-2 rounded-full font-bold text-center hover:bg-opacity-90 transition">로그인</a>
+  <!-- 로그인 후 노출될 유저/로그아웃 버튼(초기에 hidden) -->
+  <span id="userNavMobile" class="hidden flex items-center space-x-2">
+    <span id="userNameMobile" class="text-secondary font-bold"></span>
+  </span>
     </nav>
     <div class="mt-auto text-xs text-gray-400 pt-8 text-center">© 2024 로또1081</div>
   </div>
@@ -118,23 +143,10 @@
     </div>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script>
-    // TODO: 본인 firebaseConfig로 교체!
-const firebaseConfig = {
-  apiKey: "AIzaSyBH3AvpxtOF7NQDH_fDOuAXSyEfw8r5kbU",
-  authDomain: "lotto1081-2b3dc.firebaseapp.com",
-  projectId: "lotto1081-2b3dc",
-  storageBucket: "lotto1081-2b3dc.firebasestorage.app",
-  messagingSenderId: "785261698548",
-  appId: "1:785261698548:web:84531550d2380c24f82da1",
-  measurementId: "G-EMCRJS1KM2"
-};
-    firebase.initializeApp(firebaseConfig);
+<script>
     const db = firebase.firestore();
 
+    
     // 모달 열고 닫기
     const writeModal = document.getElementById('writeModal');
     const openWriteBtn = document.getElementById('openWriteBtn');
@@ -215,7 +227,73 @@ const firebaseConfig = {
 
     // 최초 로딩
     loadQnA();
+    
   </script>
+
+
+<script>
+  // 네비게이션 상태 변경(로그인/로그아웃)
+document.addEventListener('DOMContentLoaded', function() {
+  firebase.auth().onAuthStateChanged(function(user) {
+    // 데스크톱
+    const loginNavBtn = document.getElementById('loginNavBtn');
+    const userNav = document.getElementById('userNav');
+    const userName = document.getElementById('userName');
+    const logoutNavBtn = document.getElementById('logoutNavBtn');
+    // 모바일
+    const loginMobileBtn = document.getElementById('loginMobileBtn');
+    const userNavMobile = document.getElementById('userNavMobile');
+    const userNameMobile = document.getElementById('userNameMobile');
+    const logoutMobileBtn = document.getElementById('logoutMobileBtn');
+
+    if (user) {
+      // Firestore에서 유저명 불러오기(선택)
+      firebase.firestore().collection('users').doc(user.uid).get().then(doc => {
+        const name = doc.exists && doc.data().name ? doc.data().name + '님' : user.email || '회원님';
+        if (userName) userName.textContent = name;
+        if (userNameMobile) userNameMobile.textContent = name;
+      }).catch(() => {
+        if (userName) userName.textContent = user.email || '회원님';
+        if (userNameMobile) userNameMobile.textContent = user.email || '회원님';
+      });
+
+      // 데스크톱
+      if (loginNavBtn) loginNavBtn.style.display = "none";
+      if (userNav) userNav.classList.remove('hidden');
+      // 모바일
+      if (loginMobileBtn) loginMobileBtn.style.display = "none";
+      if (userNavMobile) userNavMobile.classList.remove('hidden');
+    } else {
+      // 데스크톱
+      if (loginNavBtn) loginNavBtn.style.display = "inline-block";
+      if (userNav) userNav.classList.add('hidden');
+      // 모바일
+      if (loginMobileBtn) loginMobileBtn.style.display = "block";
+      if (userNavMobile) userNavMobile.classList.add('hidden');
+    }
+
+    // 로그아웃 이벤트 (데스크톱)
+    if (logoutNavBtn) {
+      logoutNavBtn.onclick = function(e) {
+        e.preventDefault();
+        firebase.auth().signOut().then(function() {
+          window.location.reload();
+        });
+      }
+    }
+    // 로그아웃 이벤트 (모바일)
+    if (logoutMobileBtn) {
+      logoutMobileBtn.onclick = function(e) {
+        e.preventDefault();
+        firebase.auth().signOut().then(function() {
+          window.location.reload();
+        });
+      }
+    }
+  });
+});
+
+</script>
 
   <!-- 햄버거 메뉴 동작 스크립트 (아래 한 번만 추가하면 됨) -->
   <script>
