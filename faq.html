@@ -31,7 +31,7 @@
   </style>
 </head>
 <body class="bg-light min-h-screen">
-<!-- Navigation (공통으로 복붙 가능) -->
+<!-- 네비게이션 바 (항상 보임) -->
 <nav class="fixed w-full bg-white/90 backdrop-blur-sm shadow-sm z-50 border-b border-accent/20">
   <div class="container mx-auto px-4">
     <div class="flex items-center justify-between h-16">
@@ -55,21 +55,22 @@
       </button>
     </div>
   </div>
-  <!-- 모바일 전체 메뉴 오버레이 (숨김, 토글) -->
-  <div id="mobileMenu" class="md:hidden fixed inset-0 bg-black/40 z-50 hidden">
-    <div class="absolute right-0 top-0 w-64 h-full bg-white shadow-xl flex flex-col pt-8 pb-4 px-6">
-      <!-- 닫기 버튼 -->
-      <button id="closeMenu" class="absolute top-3 right-4 text-2xl text-accent hover:text-primary">&times;</button>
-      <nav class="flex flex-col space-y-6 mt-8">
-        <a href="index.html" class="text-gray-700 text-lg font-bold hover:text-primary">홈</a>
-        <a href="myPage.html" class="text-gray-700 text-lg font-bold hover:text-primary">마이페이지</a>
-        <a href="faq.html" class="text-gray-700 text-lg font-bold hover:text-primary">고객센터</a>
-        <a href="login.html" class="text-white bg-primary text-lg px-4 py-2 rounded-full font-bold text-center hover:bg-opacity-90 transition">로그아웃</a>
-      </nav>
-      <div class="mt-auto text-xs text-gray-400 pt-8 text-center">© 2024 로또1081</div>
-    </div>
-  </div>
 </nav>
+
+<!-- 모바일 전체 메뉴 오버레이 (오직 모바일에서만, nav 외부에!) -->
+<div id="mobileMenu" class="md:hidden fixed inset-0 bg-black/70 z-50 hidden">
+  <div class="absolute right-0 top-0 w-64 h-full bg-white shadow-xl flex flex-col pt-8 pb-4 px-6">
+    <!-- 닫기 버튼 -->
+    <button id="closeMenu" class="absolute top-3 right-4 text-2xl text-accent hover:text-primary">&times;</button>
+    <nav class="flex flex-col space-y-6 mt-8">
+      <a href="index.html" class="text-gray-700 text-lg font-bold hover:text-primary">홈</a>
+      <a href="myPage.html" class="text-gray-700 text-lg font-bold hover:text-primary">마이페이지</a>
+      <a href="faq.html" class="text-gray-700 text-lg font-bold hover:text-primary">고객센터</a>
+      <a href="login.html" class="text-white bg-primary text-lg px-4 py-2 rounded-full font-bold text-center hover:bg-opacity-90 transition">로그아웃</a>
+    </nav>
+    <div class="mt-auto text-xs text-gray-400 pt-8 text-center">© 2024 로또1081</div>
+  </div>
+</div>
 <!-- 네비 겹침 방지 padding-top 적용 예시 -->
 <div class="h-16 md:h-16"></div>
 
@@ -226,6 +227,6 @@ const firebaseConfig = {
   // 메뉴 오버레이 클릭시 닫기
   mobileMenu.onclick = (e) => { if(e.target === mobileMenu) mobileMenu.classList.add('hidden'); };
   </script>
-  
+
 </body>
 </html>
