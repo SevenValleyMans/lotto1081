@@ -45,6 +45,7 @@
     body { font-family: 'Noto Sans KR', sans-serif; }
     .modal-bg { background: rgba(0,0,0,0.4); }
     .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
   </style>
 </head>
 <body class="bg-light min-h-screen">
@@ -135,34 +136,86 @@
     </div>
   </div>
 
-  <!-- 상세 모달 -->
-  <div id="detailModal" class="fixed inset-0 z-50 hidden items-center justify-center modal-bg">
-    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-auto">
-      <button id="closeDetailBtn" class="absolute top-2 right-2 text-gray-400 hover:text-primary text-xl">&times;</button>
-      <div id="detailContent"></div>
-    </div>
+<!-- 상세 모달 -->
+<div id="detailModal" class="fixed inset-0 z-50 hidden items-center justify-center modal-bg">
+  <div id="modalInner" class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-auto relative">
+    <button id="closeDetailBtn" class="absolute top-2 right-2 text-gray-400 hover:text-primary text-xl">&times;</button>
+    <div id="detailContent"></div>
   </div>
+</div>
 
 <script>
-    const db = firebase.firestore();
+const db = firebase.firestore();
+let currentUserEmail = null;
 
-    
-    // 모달 열고 닫기
-    const writeModal = document.getElementById('writeModal');
-    const openWriteBtn = document.getElementById('openWriteBtn');
-    const cancelWriteBtn = document.getElementById('cancelWriteBtn');
-    openWriteBtn.onclick = () => { writeModal.classList.remove('hidden'); }
-    cancelWriteBtn.onclick = () => { writeModal.classList.add('hidden'); }
+firebase.auth().onAuthStateChanged(function(user) {
+  currentUserEmail = user && user.email ? user.email : null;
+});
+
+// 상세 모달
+window.showDetail = async function(docId) {
+  const modal = document.getElementById('detailModal');
+  const content = document.getElementById('detailContent');
+  const doc = await db.collection("qna").doc(docId).get();
+  const q = doc.data();
+
+  // 본인 글이면 [내 글] 표시
+  let myPostBadge = '';
+  if (currentUserEmail && q.email && q.email === currentUserEmail) {
+    myPostBadge = `<span class="ml-2 px-2 py-0.5 bg-primary text-white text-xs rounded-full align-middle">내 글</span>`;
+  }
+
+  content.innerHTML = `
+    <div class="mb-2">
+      <span class="text-primary font-bold mr-2">${q.nickname || "익명"}</span>
+      ${myPostBadge}
+      <span class="text-xs text-gray-400">${q.createdAt.toDate ? q.createdAt.toDate().toLocaleString() : ''}</span>
+    </div>
+    <div class="font-semibold text-xl mb-2">${q.title}</div>
+    <div class="text-gray-700 mb-6 whitespace-pre-line">${q.content}</div>
+    ${
+      q.answer && q.answer.trim() ?
+      `<div class="bg-secondary/10 border-l-4 border-secondary px-4 py-3 rounded text-secondary font-semibold mt-3">
+        <span class="block mb-1">운영팀 답변</span>
+        <div class="text-gray-700">${q.answer}</div>
+      </div>`
+      : `<div class="text-accent text-sm italic">아직 답변이 등록되지 않았습니다.</div>`
+    }
+  `;
+  modal.classList.remove('hidden');
+}
+
+// 모달 닫기: X 버튼 + 배경 클릭
+const detailModal = document.getElementById('detailModal');
+const modalInner = document.getElementById('modalInner');
+
+document.getElementById('closeDetailBtn').onclick = () => {
+  detailModal.classList.add('hidden');
+};
+// 배경 클릭 시 닫기 (내부 클릭은 무시)
+detailModal.onclick = (e) => {
+  if (e.target === detailModal) {
+    detailModal.classList.add('hidden');
+  }
+};
 
     // QnA 글 등록
     document.getElementById('qnaForm').onsubmit = async function(e) {
       e.preventDefault();
       const title = document.getElementById('qTitle').value.trim();
       const content = document.getElementById('qContent').value.trim();
+      const user = firebase.auth().currentUser;
       if (!title || !content) return;
+
+      // 로그인 사용자만 글 작성 가능하도록
+      if (!user || !user.email) {
+        alert('로그인 후 글쓰기가 가능합니다.');
+        return;
+      }
 
       await db.collection("qna").add({
         nickname: "익명",
+        email: user.email,            // 이메일 저장!
         title,
         content,
         answer: "",
@@ -173,57 +226,37 @@
       loadQnA();
     };
 
-    // QnA 리스트 표시
-    async function loadQnA() {
-      const listElem = document.getElementById('qnaList');
-      listElem.innerHTML = "";
-      const snapshot = await db.collection("qna").orderBy("createdAt", "desc").get();
-      if (snapshot.empty) {
-        listElem.innerHTML = "<p class='text-center text-accent py-8'>아직 등록된 글이 없습니다.</p>";
-        return;
-      }
-      snapshot.forEach(doc => {
-        const q = doc.data();
-        listElem.innerHTML += `
-          <div class="bg-light border border-accent rounded-lg p-4 cursor-pointer hover:bg-accent/10 transition" onclick="showDetail('${doc.id}')">
-            <div class="flex items-center mb-1">
-              <span class="text-primary font-bold mr-2">${q.nickname || "익명"}</span>
-              <span class="text-xs text-gray-400">${q.createdAt.toDate ? q.createdAt.toDate().toLocaleString() : ''}</span>
-            </div>
-            <div class="font-semibold text-lg">${q.title}</div>
-            <div class="text-gray-600 line-clamp-2">${q.content}</div>
-          </div>
-        `;
-      });
-    }
 
-    // 상세 모달
-    window.showDetail = async function(docId) {
-      const modal = document.getElementById('detailModal');
-      const content = document.getElementById('detailContent');
-      const doc = await db.collection("qna").doc(docId).get();
-      const q = doc.data();
-      content.innerHTML = `
-        <div class="mb-2">
+// QnA 리스트 표시
+async function loadQnA() {
+  const listElem = document.getElementById('qnaList');
+  listElem.innerHTML = "";
+  const snapshot = await db.collection("qna").orderBy("createdAt", "desc").get();
+  if (snapshot.empty) {
+    listElem.innerHTML = "<p class='text-center text-accent py-8'>아직 등록된 글이 없습니다.</p>";
+    return;
+  }
+  snapshot.forEach(doc => {
+    const q = doc.data();
+    // 내 글이면 뱃지 추가
+    let myPostBadge = "";
+    if (currentUserEmail && q.email === currentUserEmail) {
+      myPostBadge = `<span class="ml-2 px-2 py-0.5 bg-primary text-white text-xs rounded-full align-middle">내 글</span>`;
+    }
+    listElem.innerHTML += `
+      <div class="bg-light border border-accent rounded-lg p-4 cursor-pointer hover:bg-accent/10 transition" onclick="showDetail('${doc.id}')">
+        <div class="flex items-center mb-1">
           <span class="text-primary font-bold mr-2">${q.nickname || "익명"}</span>
+          ${myPostBadge}
           <span class="text-xs text-gray-400">${q.createdAt.toDate ? q.createdAt.toDate().toLocaleString() : ''}</span>
         </div>
-        <div class="font-semibold text-xl mb-2">${q.title}</div>
-        <div class="text-gray-700 mb-6 whitespace-pre-line">${q.content}</div>
-        ${
-          q.answer && q.answer.trim() ?
-          `<div class="bg-secondary/10 border-l-4 border-secondary px-4 py-3 rounded text-secondary font-semibold mt-3">
-            <span class="block mb-1">운영팀 답변</span>
-            <div class="text-gray-700">${q.answer}</div>
-          </div>`
-          : `<div class="text-accent text-sm italic">아직 답변이 등록되지 않았습니다.</div>`
-        }
-      `;
-      modal.classList.remove('hidden');
-    }
-    document.getElementById('closeDetailBtn').onclick = () => {
-      document.getElementById('detailModal').classList.add('hidden');
-    };
+        <div class="font-semibold text-lg">${q.title}</div>
+        <div class="text-gray-600 line-clamp-2">${q.content}</div>
+      </div>
+    `;
+  });
+}
+
 
     // 최초 로딩
     loadQnA();
