@@ -11,7 +11,6 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script>
-  // 아래 config는 본인의 firebase 프로젝트 설정 값으로 대체해야 함
     const firebaseConfig = {
       apiKey: "AIzaSyBH3AvpxtOF7NQDH_fDOuAXSyEfw8r5kbU",
       authDomain: "lotto1081-2b3dc.firebaseapp.com",
@@ -135,21 +134,6 @@
             </tr>
           </thead>
           <tbody id="recommendListTbody">
-            <tr>
-              <td class="py-2 px-3 font-semibold">1081회</td>
-              <td class="py-2 px-3">2024-06-29</td>
-              <td class="py-2 px-3">7, 19, 23, 32, 40, 42</td>
-            </tr>
-            <tr>
-              <td class="py-2 px-3 font-semibold">1080회</td>
-              <td class="py-2 px-3">2024-06-22</td>
-              <td class="py-2 px-3">3, 12, 17, 24, 33, 41</td>
-            </tr>
-            <tr>
-              <td class="py-2 px-3 font-semibold">1079회</td>
-              <td class="py-2 px-3">2024-06-15</td>
-              <td class="py-2 px-3">5, 18, 22, 28, 36, 43</td>
-            </tr>
             <!-- 더미 데이터 추가 가능 -->
           </tbody>
         </table>
@@ -179,7 +163,50 @@
 
 
   <script>
-    // 내 Q&A 내역 로드 함수
+    // 추천번호 이력 불러오기
+function loadRecommendHistory(userEmail) {
+  const tbody = document.getElementById('recommendListTbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  if (!userEmail) {
+    tbody.innerHTML = `<tr>
+      <td colspan="3" class="py-8 text-accent text-center">로그인 후 이력을 확인할 수 있습니다.</td>
+    </tr>`;
+    return;
+  }
+  firebase.firestore()
+    .collection('recommendations')
+    .where('email', '==', userEmail)
+    .orderBy('sentAt', 'desc')
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        tbody.innerHTML = `<tr>
+          <td colspan="3" class="py-8 text-accent text-center">아직 추천번호를 받은 적이 없습니다.</td>
+        </tr>`;
+        return;
+      }
+      snapshot.forEach(doc => {
+        const rec = doc.data();
+        const round = rec.round || '-';
+        const numbers = rec.numbers || '-';
+        const sentAt = rec.sentAt && rec.sentAt.toDate ? rec.sentAt.toDate().toLocaleDateString() : '-';
+        tbody.innerHTML += `
+          <tr>
+            <td class="py-2 px-3 font-semibold">${round}회</td>
+            <td class="py-2 px-3">${sentAt}</td>
+            <td class="py-2 px-3">${numbers}</td>
+          </tr>
+        `;
+      });
+    })
+    .catch(e => {
+      tbody.innerHTML = `<tr>
+        <td colspan="3" class="py-8 text-red-400 text-center">불러오기 오류: ${e.message}</td>
+      </tr>`;
+    });
+}
+
 // 내 Q&A 내역만!
 function loadMyQnA(userEmail) {
   const tbody = document.getElementById('myQnaTbody');
@@ -234,6 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // 내 Q&A 내역 불러오기
     if (user && user.email) {
       loadMyQnA(user.email);
+      loadRecommendHistory(user.email);
     } else {
       loadMyQnA(null); // 비로그인 시 안내문구 **특수한 것 !! 붙여넣기 주의****
     }
